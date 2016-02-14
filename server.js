@@ -135,10 +135,13 @@ function parseMQTTMessage (topic, message) {
     winston.info('Incoming message from MQTT: %s = %s', topic, contents);
     history[topic] = contents;
 
+        //name = pieces[2],
+        //type = pieces[3];
     var pieces = topic.split('/'),
-        name = pieces[2],
-        type = pieces[3];
+        name = pieces[1],
+        type = pieces[2];
 
+    winston.info('Incoming message from MQTT: { URL: %s, name: %s, type: %s, value: %s }', 'http://' + subscription.callback, name, type, contents);
     request.post({
         url: 'http://' + subscription.callback,
         json: {
