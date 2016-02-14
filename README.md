@@ -27,22 +27,22 @@ SmartThings <===> Node-to-MQTT Bridge (Node.js) <===> MQTT
 Events about a device (power, level, switch) are sent to MQTT using the following format:
 
 ```
-/smartthings/{DEVICE_NAME}/${ATTRIBUTE}
+smartthings/{DEVICE_NAME}/${ATTRIBUTE}
 ```
 
 For example, my Dimmer Z-Wave Lamp is called "Fireplace Lights" in SmartThings.  The following topics are published:
 
 ```
 # Brightness (0-99)
-/smartthings/Fireplace Lights/level
+smartthings/Fireplace Lights/level
 # Switch State (on|off)
-/smartthings/Fireplace Lights/switch
+smartthings/Fireplace Lights/switch
 ```
 
 The Bridge also subscribes to changes in these topics, so that you can update the device via MQTT.
 
 ```
-$ mqtt pub -t '/smartthings/Fireplace Lights/switch'  -m 'off'
+$ mqtt pub -t 'smartthings/Fireplace Lights/switch'  -m 'off'
 # Light goes off in SmartThings
 ```
 
