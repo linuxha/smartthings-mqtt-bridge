@@ -1,19 +1,19 @@
 /*jslint node: true */
 'use strict';
 
-var winston = require('winston'),
-    express = require('express'),
-    expressJoi = require('express-joi-validator'),
+var winston        = require('winston'),
+    express        = require('express'),
+    expressJoi     = require('express-joi-validator'),
     expressWinston = require('express-winston'),
-    bodyparser = require('body-parser'),
-    mqtt = require('mqtt'),
-    async = require('async'),
-    path = require('path'),
-    joi = require('joi'),
-    yaml = require('js-yaml'),
-    jsonfile = require('jsonfile'),
-    fs = require('fs'),
-    request = require('request');
+    bodyparser     = require('body-parser'),
+    mqtt           = require('mqtt'),
+    async          = require('async'),
+    path           = require('path'),
+    joi            = require('joi'),
+    yaml           = require('js-yaml'),
+    jsonfile       = require('jsonfile'),
+    fs             = require('fs'),
+    request        = require('request');
 
 var CONFIG_DIR = process.env.CONFIG_DIR || process.cwd();
 
@@ -57,7 +57,8 @@ function loadConfiguration () {
  * @param  {Result}  res            Result Object
  */
 function handlePushEvent (req, res) {
-    var topic = ['', 'smartthings', req.body.name, req.body.type].join('/'),
+    //var topic = ['', 'smartthings', req.body.name, req.body.type].join('/'),
+    var topic = ['smartthings', req.body.name, req.body.type].join('/'),
         value = req.body.value;
 
     winston.info('Incoming message from SmartThings: %s = %s', topic, value);
@@ -91,7 +92,10 @@ function handleSubscribeEvent (req, res) {
     // Subscribe to all events
     Object.keys(req.body.devices).forEach(function (type) {
         req.body.devices[type].forEach(function (device) {
-            var topicName = ['', 'smartthings', device, type].join('/');
+	    // MQTT recommends dropping that first '/'
+	    // and it does work better (at least with Mosquitto)
+            //var topicName = ['', 'smartthings', device, type].join('/');
+            var topicName = ['smartthings', device, type].join('/');
             subscription.topics.push(topicName);
         });
     });
@@ -154,7 +158,7 @@ function parseMQTTMessage (topic, message) {
 // Main flow
 async.series([
     function connectToMQTT (next) {
-        winston.info('Connecting to MQTT');
+        winston.info('Connecting to MQTT mqtt://' + config.mqtt.host);
         client = mqtt.connect('mqtt://' + config.mqtt.host);
         client.on('connect', function () {
             next();
@@ -228,11 +232,11 @@ async.series([
             }
         });
 
-        app.listen(8080, next);
+        app.listen(28080, next);
     }
 ], function (error) {
     if (error) {
         return winston.error(error);
     }
-    winston.info('Listening at http://localhost:8080');
+    winston.info('Listening at http://localhost:28080');
 });
